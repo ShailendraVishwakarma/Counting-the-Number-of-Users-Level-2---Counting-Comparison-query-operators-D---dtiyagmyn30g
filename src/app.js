@@ -25,6 +25,8 @@ app.get("/",async function(req,res){
 
     //Write you code here
     //update count variable
+    const namePrefix = req.query.name || '';
+    const count = await User.countDocuments({ name: { $regex: `^${namePrefix}`, $options: 'i' } });
 
     res.send(JSON.stringify(count));
 
