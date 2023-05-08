@@ -1,35 +1,26 @@
 const express = require('express');
-const app = express();
 const mongoose = require('mongoose');
-const users   =require("../models/user.js");
+const User = require('./models/user');
 
-//Router Middlewares
-app.use(express.json());
+const app = express();
+const port = 3000;
 
-//Type of query (Hint)
+mongoose.connect('mongodb://localhost/myapp', { useNewUrlParser: true });
 
-/*
-
-1. / --> this means we need to consider all users
-2. /?name=swa --> Will return count of all the user name that have prefix swa. We will (Swaraj Jain, Swarak agrawal, etc). 
-3. /?name= -->this means we need to consider all users
-
-*/
-
-
-// Complete this Route which will return the count of Number of Prefixmatch for the name in the query/
-
-app.get("/",async function(req,res){
-
-    var count = 0;
-
-    //Write you code here
-    //update count variable
+app.get('/', async (req, res) => {
+  try {
     const namePrefix = req.query.name || '';
     const count = await User.countDocuments({ name: { $regex: `^${namePrefix}`, $options: 'i' } });
-
-    res.send(JSON.stringify(count));
-
+    res.send({ count });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ error: 'Internal server error' });
+  }
 });
+
+app.listen(port, () => {
+  console.log(`App listening at http://localhost:${port}`);
+});
+
 
 module.exports = app;
